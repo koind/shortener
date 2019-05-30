@@ -12,11 +12,11 @@ type Shortener interface {
 }
 
 type LinkShortener struct {
-	repo Repository
+	repo UrlRepository
 	err  error
 }
 
-func NewShortener(repository Repository) *LinkShortener {
+func NewShortener(repository UrlRepository) *LinkShortener {
 	return &LinkShortener{
 		repo: repository,
 	}

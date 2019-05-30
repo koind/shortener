@@ -1,23 +1,23 @@
 package shortener
 
-type Repository interface {
+type UrlRepository interface {
 	FindByShortUrl(url string) string
 	FindByLongUrl(url string) string
 	GetError() error
 }
 
-type MemoryRepository struct {
+type UrlMemoryRepository struct {
 	database map[string]string
 	err      error
 }
 
-func NewMemoryRepository() *MemoryRepository {
-	return &MemoryRepository{
+func NewUrlMemoryRepository() *UrlMemoryRepository {
+	return &UrlMemoryRepository{
 		database: make(map[string]string),
 	}
 }
 
-func (m *MemoryRepository) FindByShortUrl(url string) string {
+func (m *UrlMemoryRepository) FindByShortUrl(url string) string {
 	if m.err != nil {
 		return ""
 	}
@@ -31,7 +31,7 @@ func (m *MemoryRepository) FindByShortUrl(url string) string {
 	return ""
 }
 
-func (m *MemoryRepository) FindByLongUrl(url string) string {
+func (m *UrlMemoryRepository) FindByLongUrl(url string) string {
 	if m.err != nil {
 		return ""
 	}
@@ -45,6 +45,6 @@ func (m *MemoryRepository) FindByLongUrl(url string) string {
 	return ""
 }
 
-func (m *MemoryRepository) GetError() error {
+func (m *UrlMemoryRepository) GetError() error {
 	return m.err
 }
