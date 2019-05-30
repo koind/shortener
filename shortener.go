@@ -16,6 +16,12 @@ type LinkShortener struct {
 	err     error
 }
 
+func NewShortener() *LinkShortener {
+	return &LinkShortener{
+		storage: make(map[string]string),
+	}
+}
+
 func (l *LinkShortener) Shorten(url string) string {
 	if l.err != nil {
 		return ""
@@ -39,23 +45,23 @@ func (l *LinkShortener) Resolve(url string) string {
 		return ""
 	}
 
-	return ""
+	return l.findByShortUrl(url)
 }
 
 func (l *LinkShortener) GetError() error {
 	return l.err
 }
 
-func (l *LinkShortener) hasLink(url string) bool {
+func (l *LinkShortener) findByShortUrl(url string) string {
 	if l.err != nil {
-		return false
+		return ""
 	}
 
-	_, has := l.storage[url]
+	for longUrl, shortUrl := range l.storage {
+		if shortUrl == url {
+			return longUrl
+		}
+	}
 
-	return has
-}
-
-func NewShortener() *LinkShortener {
-	return new(LinkShortener)
+	return ""
 }
