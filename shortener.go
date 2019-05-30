@@ -12,13 +12,13 @@ type Shortener interface {
 }
 
 type LinkShortener struct {
-	storage map[string]string
-	err     error
+	repo Repository
+	err  error
 }
 
-func NewShortener() *LinkShortener {
+func NewShortener(repository Repository) *LinkShortener {
 	return &LinkShortener{
-		storage: make(map[string]string),
+		repo: repository,
 	}
 }
 
@@ -45,23 +45,9 @@ func (l *LinkShortener) Resolve(url string) string {
 		return ""
 	}
 
-	return l.findByShortUrl(url)
+	return l.repo.FindByShortUrl(url)
 }
 
 func (l *LinkShortener) GetError() error {
 	return l.err
-}
-
-func (l *LinkShortener) findByShortUrl(url string) string {
-	if l.err != nil {
-		return ""
-	}
-
-	for longUrl, shortUrl := range l.storage {
-		if shortUrl == url {
-			return longUrl
-		}
-	}
-
-	return ""
 }
