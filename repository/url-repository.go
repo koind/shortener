@@ -1,4 +1,4 @@
-package shortener
+package repository
 
 type UrlRepository interface {
 	FindByShortUrl(url string) string

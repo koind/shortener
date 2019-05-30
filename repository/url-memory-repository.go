@@ -1,4 +1,4 @@
-package shortener
+package repository
 
 type UrlMemoryRepository struct {
 	database map[string]string

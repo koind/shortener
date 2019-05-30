@@ -2,6 +2,7 @@ package shortener
 
 import (
 	"errors"
+	"github.com/koind/shortener/repository"
 )
 
 const EmptyUrlError = "url must not be empty"
@@ -12,11 +13,11 @@ type Shortener interface {
 }
 
 type LinkShortener struct {
-	repo UrlRepository
+	repo repository.UrlRepository
 	err  error
 }
 
-func NewShortener(repository UrlRepository) *LinkShortener {
+func NewShortener(repository repository.UrlRepository) *LinkShortener {
 	return &LinkShortener{
 		repo: repository,
 	}
