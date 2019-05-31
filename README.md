@@ -26,8 +26,11 @@ import (
 func main() {
 	linkShortener := shortener.NewShortener(repository.NewUrlMemoryRepository(), hasher.NewMd5HashGenerator())
 	
-	linkShortener.Shorten("http://site.com/some-long-link") // http://site.com/72110a
-	linkShortener.Resolve("http://site.com/72110a") // http://site.com/some-long-link
+	longUrl := linkShortener.Shorten("http://site.com/some-long-link") 
+	println(longUrl) // http://site.com/72110a
+	
+	shortUrl := linkShortener.Resolve("http://site.com/72110a") 
+	println(shortUrl) // http://site.com/some-long-link
 	
 	if err := linkShortener.GetError(); err != nil {
 		println(err)
