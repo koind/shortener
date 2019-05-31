@@ -2,7 +2,7 @@ package shortener
 
 import (
 	"errors"
-	"github.com/koind/shortener/hash"
+	"github.com/koind/shortener/hasher"
 	"github.com/koind/shortener/repository"
 	"net/url"
 )
@@ -13,15 +13,15 @@ type Shortener interface {
 }
 
 type LinkShortener struct {
-	repo repository.UrlRepository
-	hash hash.HashGenerator
-	err  error
+	repo   repository.UrlRepository
+	hasher hasher.HashGenerator
+	err    error
 }
 
-func NewShortener(repository repository.UrlRepository, hash hash.HashGenerator) *LinkShortener {
+func NewShortener(repository repository.UrlRepository, hasher hasher.HashGenerator) *LinkShortener {
 	return &LinkShortener{
-		repo: repository,
-		hash: hash,
+		repo:   repository,
+		hasher: hasher,
 	}
 }
 
@@ -42,8 +42,8 @@ func (l *LinkShortener) Shorten(longUrl string) string {
 	}
 
 	urlPath := u.RequestURI()
-	urlHash := l.hash.Generate(urlPath)
-	if err := l.hash.GetError(); err != nil {
+	urlHash := l.hasher.Generate(urlPath)
+	if err := l.hasher.GetError(); err != nil {
 		l.err = err
 		return ""
 	}

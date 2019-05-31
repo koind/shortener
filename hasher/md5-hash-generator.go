@@ -1,4 +1,4 @@
-package hash
+package hasher
 
 type Md5HashGenerator struct {
 	err error
