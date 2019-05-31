@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -43,8 +42,7 @@ func TestUrlMemoryRepository_Remove(t *testing.T) {
 func TestUrlMemoryRepository_GetError(t *testing.T) {
 	urlMemoryRepository.Add("", "")
 
-	sampleErr := errors.New(EmptyLongOrShortUrlError)
-	if err := urlMemoryRepository.GetError(); err == sampleErr {
-		t.Errorf("Errors does not match %s - %s", sampleErr, err)
+	if err := urlMemoryRepository.GetError(); err.Error() != EmptyLongOrShortUrlError {
+		t.Errorf("Errors does not match %s - %s", EmptyLongOrShortUrlError, err)
 	}
 }

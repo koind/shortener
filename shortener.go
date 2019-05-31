@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/koind/shortener/hasher"
 	"github.com/koind/shortener/repository"
+	"github.com/koind/shortener/stringer"
 	"net/url"
 )
 
@@ -48,15 +49,17 @@ func (l *LinkShortener) Shorten(longUrl string) string {
 		return ""
 	}
 
-	shortUrl, err := u.Parse(urlHash)
+	urlStruct, err := u.Parse(urlHash)
 	if err != nil {
 		l.err = err
 		return ""
 	}
 
-	l.repo.Add(longUrl, shortUrl.String())
+	shortUrl := stringer.Substr(urlStruct.String(), 0, 6)
 
-	return shortUrl.String()
+	l.repo.Add(longUrl, shortUrl)
+
+	return shortUrl
 }
 
 func (l *LinkShortener) Resolve(shortUrl string) string {
