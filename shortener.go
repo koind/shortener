@@ -49,17 +49,17 @@ func (l *LinkShortener) Shorten(longUrl string) string {
 		return ""
 	}
 
-	urlStruct, err := u.Parse(urlHash)
+	urlHash = stringer.Substr(urlHash, 0, 6)
+
+	shortUrl, err := u.Parse(urlHash)
 	if err != nil {
 		l.err = err
 		return ""
 	}
 
-	shortUrl := stringer.Substr(urlStruct.String(), 0, 6)
+	l.repo.Add(longUrl, shortUrl.String())
 
-	l.repo.Add(longUrl, shortUrl)
-
-	return shortUrl
+	return shortUrl.String()
 }
 
 func (l *LinkShortener) Resolve(shortUrl string) string {
