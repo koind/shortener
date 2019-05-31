@@ -5,8 +5,6 @@ import (
 	"github.com/koind/shortener/repository"
 )
 
-const EmptyUrlError = "url must not be empty"
-
 type Shortener interface {
 	Shorten(url string) string
 	Resolve(url string) string
@@ -29,7 +27,7 @@ func (l *LinkShortener) Shorten(url string) string {
 	}
 
 	if url == "" {
-		l.err = errors.New(EmptyUrlError)
+		l.err = errors.New(repository.EmptyUrlError)
 		return ""
 	}
 
@@ -42,7 +40,7 @@ func (l *LinkShortener) Resolve(url string) string {
 	}
 
 	if url == "" {
-		l.err = errors.New(EmptyUrlError)
+		l.err = errors.New(repository.EmptyUrlError)
 		return ""
 	}
 
