@@ -9,14 +9,13 @@ import (
 )
 
 type Shortener interface {
-	Shorten(url string) string
-	Resolve(url string) string
+	Shorten(url string) (string, error)
+	Resolve(url string) (string, error)
 }
 
 type LinkShortener struct {
 	repo   repository.UrlRepository
 	hasher hasher.HashGenerator
-	err    error
 }
 
 func NewShortener(repository repository.UrlRepository, hasher hasher.HashGenerator) *LinkShortener {
@@ -26,55 +25,46 @@ func NewShortener(repository repository.UrlRepository, hasher hasher.HashGenerat
 	}
 }
 
-func (l *LinkShortener) Shorten(longUrl string) string {
-	if l.err != nil {
-		return ""
+func (l *LinkShortener) Shorten(fullUrl string) (string, error) {
+	if fullUrl == "" {
+		return "", errors.New(repository.EmptyUrlError)
 	}
 
-	if longUrl == "" {
-		l.err = errors.New(repository.EmptyUrlError)
-		return ""
-	}
-
-	u, err := url.Parse(longUrl)
+	u, err := url.Parse(fullUrl)
 	if err != nil {
-		l.err = err
-		return ""
+		return "", err
 	}
 
 	urlPath := u.RequestURI()
-	urlHash := l.hasher.Generate(urlPath)
-	if err := l.hasher.GetError(); err != nil {
-		l.err = err
-		return ""
+	urlHash, err := l.hasher.Generate(urlPath)
+	if err != nil {
+		return "", err
 	}
 
 	urlHash = stringer.Substr(urlHash, 0, 6)
 
 	shortUrl, err := u.Parse(urlHash)
 	if err != nil {
-		l.err = err
-		return ""
+		return "", err
 	}
 
-	l.repo.Add(longUrl, shortUrl.String())
+	_, err = l.repo.Add(fullUrl, shortUrl.String())
+	if err != nil {
+		return "", err
+	}
 
-	return shortUrl.String()
+	return shortUrl.String(), nil
 }
 
-func (l *LinkShortener) Resolve(shortUrl string) string {
-	if l.err != nil {
-		return ""
-	}
-
+func (l *LinkShortener) Resolve(shortUrl string) (string, error) {
 	if shortUrl == "" {
-		l.err = errors.New(repository.EmptyUrlError)
-		return ""
+		return "", errors.New(repository.EmptyUrlError)
 	}
 
-	return l.repo.FindByShortUrl(shortUrl)
-}
+	fullUrl, err := l.repo.FindByShortUrl(shortUrl)
+	if err != nil {
+		return "", err
+	}
 
-func (l *LinkShortener) GetError() error {
-	return l.err
+	return fullUrl, nil
 }
