@@ -37,24 +37,14 @@ func (l *LinkShortener) Shorten(fullUrl string) (string, error) {
 	}
 
 	urlPath := u.RequestURI()
-	urlHash, err := l.hasher.Generate(urlPath)
-	if err != nil {
-		return "", err
-	}
-
-	shortUrl, err := u.Parse(urlHash)
+	shortUrl, err := l.generateShortUrl(u, urlPath)
 	if err != nil {
 		return "", err
 	}
 
 	for urlStr, _ := l.repo.FindByShortUrl(shortUrl.String()); urlStr != ""; {
 		urlPath = fmt.Sprintf("%s%d", urlPath, rand.Int())
-		urlHash, err = l.hasher.Generate(urlPath)
-		if err != nil {
-			return "", err
-		}
-
-		shortUrl, err = shortUrl.Parse(urlHash)
+		shortUrl, err = l.generateShortUrl(shortUrl, urlPath)
 		if err != nil {
 			return "", err
 		}
@@ -79,4 +69,18 @@ func (l *LinkShortener) Resolve(shortUrl string) (string, error) {
 	}
 
 	return fullUrl, nil
+}
+
+func (l *LinkShortener) generateShortUrl(u *url.URL, urlPath string) (*url.URL, error) {
+	urlHash, err := l.hasher.Generate(urlPath)
+	if err != nil {
+		return &url.URL{}, err
+	}
+
+	shortUrl, err := u.Parse(urlHash)
+	if err != nil {
+		return &url.URL{}, err
+	}
+
+	return shortUrl, nil
 }
