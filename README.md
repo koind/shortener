@@ -26,15 +26,18 @@ import (
 func main() {
 	linkShortener := shortener.NewShortener(repository.NewUrlMemoryRepository(), hasher.NewMd5HashGenerator())
 	
-	longUrl := linkShortener.Shorten("http://site.com/some-long-link") 
-	println(longUrl) // http://site.com/72110a
-	
-	shortUrl := linkShortener.Resolve("http://site.com/72110a") 
-	println(shortUrl) // http://site.com/some-long-link
-	
-	if err := linkShortener.GetError(); err != nil {
+	fullUrl, err := linkShortener.Shorten("http://site.com/some-long-link")
+	if err != nil {
 		println(err)
 	}
+	
+	println(fullUrl) // http://site.com/72110a
+	
+	shortUrl, err := linkShortener.Resolve("http://site.com/72110a")
+	if err != nil {
+		println(err)
+	}
+	println(shortUrl) // http://site.com/some-long-link
 }
 ```
 
@@ -46,26 +49,22 @@ The following methods are available:
 
 ```go
 NewShortener(repository repository.UrlRepository, hasher hasher.HashGenerator) *LinkShortener
-Shorten(longUrl string) string
-Resolve(shortUrl string) string
-GetError() error
+Shorten(url string) (string, error)
+Resolve(url string) (string, error)
 ```
 
 ##### koind/shortener/repository
 
 ```go
-Add(longUrl, shortUrl string) bool
-FindByShortUrl(url string) string
-FindByLongUrl(url string) string
-Remove(url string) bool
-GetError() error
+Add(longUrl, shortUrl string) (bool, error)
+FindByShortUrl(url string) (string, error)
+Remove(url string) (bool, error)
 ```
 
 ##### koind/shortener/hasher
 
 ```go
-Generate(url string) string
-GetError() error
+Generate(url string) (string, error)
 ```
 
 ##### koind/shortener/stringer
