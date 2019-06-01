@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"github.com/koind/shortener/repository"
+	"github.com/koind/shortener/stringer"
 	"hash"
 )
 
@@ -18,12 +19,14 @@ func NewMd5HashGenerator() *Md5HashGenerator {
 	}
 }
 
-func (m *Md5HashGenerator) Generate(url string) (string, error) {
-	if url == "" {
+func (m *Md5HashGenerator) Generate(text string) (string, error) {
+	if text == "" {
 		return "", errors.New(repository.EmptyUrlError)
 	}
 
-	m.hasher.Write([]byte(url))
+	m.hasher.Write([]byte(text))
+	urlHash := hex.EncodeToString(m.hasher.Sum(nil))
+	urlHash = stringer.Substr(urlHash, 0, 6)
 
-	return hex.EncodeToString(m.hasher.Sum(nil)), nil
+	return urlHash, nil
 }

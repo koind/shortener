@@ -5,7 +5,7 @@ import (
 )
 
 var hasher *Md5HashGenerator
-var str, hashStr = "hello world", "5eb63bbbe01eeed093cb22bb8f5acdc3"
+var str, hashStr = "hello world", "5eb63b"
 
 func init() {
 	hasher = NewMd5HashGenerator()
