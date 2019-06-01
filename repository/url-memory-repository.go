@@ -4,12 +4,12 @@ import "errors"
 
 const (
 	EmptyUrlError            = "url must not be empty"
-	EmptyLongOrShortUrlError = "longUrl or shortUrl must not be empty"
+	EmptyFullOrShortUrlError = "fullUrl or shortUrl must not be empty"
+	NoSuchUrl                = "no such url"
 )
 
 type UrlMemoryRepository struct {
 	database map[string]string
-	err      error
 }
 
 func NewUrlMemoryRepository() *UrlMemoryRepository {
@@ -18,77 +18,40 @@ func NewUrlMemoryRepository() *UrlMemoryRepository {
 	}
 }
 
-func (m *UrlMemoryRepository) Add(longUrl, shortUrl string) bool {
-	if m.err != nil {
-		return false
+func (m *UrlMemoryRepository) Add(fullUrl, shortUrl string) (bool, error) {
+	if fullUrl == "" || shortUrl == "" {
+		return false, errors.New(EmptyFullOrShortUrlError)
 	}
 
-	if longUrl == "" || shortUrl == "" {
-		m.err = errors.New(EmptyLongOrShortUrlError)
-		return false
-	}
+	m.database[shortUrl] = fullUrl
 
-	m.database[longUrl] = shortUrl
-
-	return true
+	return true, nil
 }
 
-func (m *UrlMemoryRepository) FindByShortUrl(url string) string {
-	if m.err != nil {
-		return ""
-	}
-
+func (m *UrlMemoryRepository) FindByShortUrl(url string) (string, error) {
 	if url == "" {
-		m.err = errors.New(EmptyUrlError)
-		return ""
+		return "", errors.New(EmptyUrlError)
 	}
 
-	for longUrl, shortUrl := range m.database {
-		if shortUrl == url {
-			return longUrl
-		}
-	}
-
-	return ""
-}
-
-func (m *UrlMemoryRepository) FindByLongUrl(url string) string {
-	if m.err != nil {
-		return ""
-	}
-
-	if url == "" {
-		m.err = errors.New(EmptyUrlError)
-		return ""
-	}
-
-	shortUrl, has := m.database[url]
+	fullUrl, has := m.database[url]
 	if !has {
-		return ""
+		return "", errors.New(NoSuchUrl)
 	}
 
-	return shortUrl
+	return fullUrl, nil
 }
 
-func (m *UrlMemoryRepository) Remove(longUrl string) bool {
-	if m.err != nil {
-		return false
+func (m *UrlMemoryRepository) Remove(shortUrl string) (bool, error) {
+	if shortUrl == "" {
+		return false, errors.New(EmptyUrlError)
 	}
 
-	if longUrl == "" {
-		m.err = errors.New(EmptyUrlError)
-		return false
+	_, err := m.FindByShortUrl(shortUrl)
+	if err != nil {
+		return false, err
 	}
 
-	if url := m.FindByLongUrl(longUrl); url == "" {
-		return false
-	}
+	delete(m.database, shortUrl)
 
-	delete(m.database, longUrl)
-
-	return true
-}
-
-func (m *UrlMemoryRepository) GetError() error {
-	return m.err
+	return true, nil
 }

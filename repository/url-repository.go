@@ -1,9 +1,7 @@
 package repository
 
 type UrlRepository interface {
-	Add(longUrl, shortUrl string) bool
-	FindByShortUrl(url string) string
-	FindByLongUrl(url string) string
-	Remove(url string) bool
-	GetError() error
+	Add(longUrl, shortUrl string) (bool, error)
+	FindByShortUrl(url string) (string, error)
+	Remove(url string) (bool, error)
 }
