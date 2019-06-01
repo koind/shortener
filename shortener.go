@@ -2,9 +2,10 @@ package shortener
 
 import (
 	"errors"
+	"fmt"
 	"github.com/koind/shortener/hasher"
 	"github.com/koind/shortener/repository"
-	"github.com/koind/shortener/stringer"
+	"math/rand"
 	"net/url"
 )
 
@@ -41,11 +42,22 @@ func (l *LinkShortener) Shorten(fullUrl string) (string, error) {
 		return "", err
 	}
 
-	urlHash = stringer.Substr(urlHash, 0, 6)
-
 	shortUrl, err := u.Parse(urlHash)
 	if err != nil {
 		return "", err
+	}
+
+	for urlStr, _ := l.repo.FindByShortUrl(shortUrl.String()); urlStr != ""; {
+		urlPath = fmt.Sprintf("%s%d", urlPath, rand.Int())
+		urlHash, err = l.hasher.Generate(urlPath)
+		if err != nil {
+			return "", err
+		}
+
+		shortUrl, err = shortUrl.Parse(urlHash)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	_, err = l.repo.Add(fullUrl, shortUrl.String())

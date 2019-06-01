@@ -14,10 +14,11 @@ func init() {
 }
 
 func TestLinkShortener_Shorten(t *testing.T) {
+	shortener.Shorten(fullUrl)
 	url, _ := shortener.Shorten(fullUrl)
 
-	if url != shortUrl {
-		t.Errorf("links does not match %s - %s", shortUrl, url)
+	if url == shortUrl {
+		t.Errorf("urls should not match %s - %s", shortUrl, url)
 	}
 }
 
