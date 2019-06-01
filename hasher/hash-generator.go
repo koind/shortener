@@ -1,6 +1,5 @@
 package hasher
 
 type HashGenerator interface {
-	Generate(url string) string
-	GetError() error
+	Generate(url string) (string, error)
 }

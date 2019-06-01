@@ -10,7 +10,6 @@ import (
 
 type Md5HashGenerator struct {
 	hasher hash.Hash
-	err    error
 }
 
 func NewMd5HashGenerator() *Md5HashGenerator {
@@ -19,21 +18,12 @@ func NewMd5HashGenerator() *Md5HashGenerator {
 	}
 }
 
-func (m *Md5HashGenerator) Generate(url string) string {
-	if m.err != nil {
-		return ""
-	}
-
+func (m *Md5HashGenerator) Generate(url string) (string, error) {
 	if url == "" {
-		m.err = errors.New(repository.EmptyUrlError)
-		return ""
+		return "", errors.New(repository.EmptyUrlError)
 	}
 
 	m.hasher.Write([]byte(url))
 
-	return hex.EncodeToString(m.hasher.Sum(nil))
-}
-
-func (m *Md5HashGenerator) GetError() error {
-	return m.err
+	return hex.EncodeToString(m.hasher.Sum(nil)), nil
 }
